@@ -21,17 +21,18 @@ class UserDaoTest {
 
     @Test
     void addAndGet() throws SQLException {
+        User user1 = new User("1", "AAA", "1112");
 
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCount());
 
-        String id = "8";
-        userDao.add(new User(id, "Munju", "1313"));
+        userDao.add(user1);
         assertEquals(1, userDao.getCount());
+        User user = userDao.findById(user1.getId());
 
-        User user = userDao.findById(id);
-        assertEquals("Munju", user.getName());
+        assertEquals(user1.getName(), user.getName());
+        assertEquals(user1.getPassword(), user.getPassword());
 
     }
 
