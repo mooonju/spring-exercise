@@ -1,6 +1,7 @@
 package com.likelion.dao;
 
 import com.likelion.domain.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -77,14 +78,19 @@ public class UserDao {
             PreparedStatement pstmt = conn.prepareStatement("SELECT id, name, password FROM users WHERE id =?");
 
             pstmt.setString(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            rs.next();
 
-            User user = new User(rs.getString("id"), rs.getString("name"), rs.getString("password"));
+            ResultSet rs = pstmt.executeQuery();
+
+            User user = null;
+            if (rs.next()) {
+                user = new User(rs.getString("id"), rs.getString("name"), rs.getString("password"));
+            }
 
             rs.close();
             pstmt.close();
             conn.close();
+
+            if(user == null) throw new EmptyResultDataAccessException(1);
 
             return user;
         } catch (SQLException e) {
