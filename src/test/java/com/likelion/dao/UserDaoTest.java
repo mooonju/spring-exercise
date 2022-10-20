@@ -8,6 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -18,14 +20,36 @@ class UserDaoTest {
     ApplicationContext context;
 
     @Test
-    void addAndSelect() {
+    void addAndGet() throws SQLException {
 
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
         String id = "8";
         userDao.add(new User(id, "Munju", "1313"));
+        assertEquals(1, userDao.getCount());
 
         User user = userDao.findById(id);
         assertEquals("Munju", user.getName());
 
+    }
+
+    @Test
+    void count() throws SQLException{
+        User user1 = new User("1", "AAA", "1112");
+        User user2 = new User("2", "BBB", "1113");
+        User user3 = new User("3", "CCC", "1114");
+
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
+        userDao.add(user1);
+        assertEquals(1, userDao.getCount());
+        userDao.add(user1);
+        assertEquals(2, userDao.getCount());
+        userDao.add(user1);
+        assertEquals(3, userDao.getCount());
     }
 }

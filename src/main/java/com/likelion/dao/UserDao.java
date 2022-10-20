@@ -16,6 +16,40 @@ public class UserDao {
         this.connectionMaker = new AwsConnectionMaker();
     }
 
+    public void deleteAll() {
+        Map<String, String> env = System.getenv();
+        try {
+            Connection conn = connectionMaker.makeConnection();
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM users");
+            pstmt.executeUpdate();
+
+            pstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getCount() {
+        Map<String, String> env = System.getenv();
+        try {
+            Connection conn = connectionMaker.makeConnection();
+            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) FROM users");
+
+            ResultSet rs = pstmt.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            rs.close();
+            pstmt.close();
+            conn.close();
+
+            return count;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void add(User user) {
         Map<String, String> env = System.getenv();
         try {
