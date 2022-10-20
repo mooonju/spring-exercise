@@ -17,42 +17,71 @@ public class UserDao {
         this.connectionMaker = new AwsConnectionMaker();
     }
 
-    public void deleteAll() {
-        Map<String, String> env = System.getenv();
-        try {
-            Connection conn = connectionMaker.makeConnection();
-            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM users");
-            pstmt.executeUpdate();
+    public void deleteAll() throws SQLException {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
 
-            pstmt.close();
-            conn.close();
+        try {
+            conn = connectionMaker.makeConnection();
+            pstmt = conn.prepareStatement("DELETE FROM users");
+            pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally { // error가 나도 실행되는 블럭
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+            }
         }
     }
 
-    public int getCount() {
-        Map<String, String> env = System.getenv();
+    public int getCount() throws SQLException {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+
         try {
-            Connection conn = connectionMaker.makeConnection();
-            PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) FROM users");
+            conn = connectionMaker.makeConnection();
 
-            ResultSet rs = pstmt.executeQuery();
+            pstmt = conn.prepareStatement("SELECT COUNT(*) FROM users");
+
+            rs = pstmt.executeQuery();
             rs.next();
-            int count = rs.getInt(1);
-
-            rs.close();
-            pstmt.close();
-            conn.close();
-
-            return count;
+            return rs.getInt(1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                }
+            }
         }
+
     }
 
     public void add(User user) {
-        Map<String, String> env = System.getenv();
         try {
             Connection conn = connectionMaker.makeConnection();
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users(id, name, password) " +
@@ -71,7 +100,6 @@ public class UserDao {
     }
 
     public User findById(String id) {
-        Map<String, String> env = System.getenv();
         Connection conn;
         try {
             conn = connectionMaker.makeConnection();
