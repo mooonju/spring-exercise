@@ -30,8 +30,8 @@ class UserDaoTest {
     void setUp() throws SQLException, ClassNotFoundException{
         this.userDao = context.getBean("awsUserDao", UserDao.class);
         this.user1 = new User("1", "AAA", "1111");
-        this.user2 = new User("2", "AAA", "1111");
-        this.user3 = new User("3", "AAA", "1111");
+        this.user2 = new User("2", "BBB", "2222");
+        this.user3 = new User("3", "CCC", "3333");
         System.out.println("before each");
     }
 
