@@ -17,20 +17,20 @@ public class UserDao {
         this.connectionMaker = new AwsConnectionMaker();
     }
 
-    public void deleteAll() throws SQLException {
+    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
         Connection conn = null;
-        PreparedStatement pstmt = null;
+        PreparedStatement ps = null;
 
         try {
             conn = connectionMaker.makeConnection();
-            pstmt = new DeleteAllStrategy().makePreparedStatement(conn);
-            pstmt.executeUpdate();
+            ps = stmt.makePreparedStatement(conn);
+            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally { // error가 나도 실행되는 블럭
-            if (pstmt != null) {
+            throw e;
+        } finally {
+            if (ps != null) {
                 try {
-                    pstmt.close();
+                    ps.close();
                 } catch (SQLException e) {
                 }
             }
@@ -42,6 +42,12 @@ public class UserDao {
             }
         }
     }
+
+    public void deleteAll() throws SQLException {
+        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
+    }
+
+
 
     public int getCount() throws SQLException {
         Connection conn = null;
