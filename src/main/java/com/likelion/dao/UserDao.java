@@ -23,7 +23,7 @@ public class UserDao {
 
         try {
             conn = connectionMaker.makeConnection();
-            pstmt = conn.prepareStatement("DELETE FROM users");
+            pstmt = new DeleteAllStrategy().makePreparedStatement(conn);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
