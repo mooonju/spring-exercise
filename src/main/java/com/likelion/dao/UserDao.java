@@ -87,22 +87,9 @@ public class UserDao {
 
     }
 
-    public void add(User user) {
-        try {
-            Connection conn = connectionMaker.makeConnection();
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users(id, name, password) " +
-                    "VALUES(?, ? ,?)");
-
-            pstmt.setString(1, user.getId());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getPassword());
-
-            pstmt.executeUpdate();
-            pstmt.close();
-            conn.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void add(User user) throws SQLException {
+        AddStrategy addStrategy = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(addStrategy);
     }
 
     public User findById(String id) {
