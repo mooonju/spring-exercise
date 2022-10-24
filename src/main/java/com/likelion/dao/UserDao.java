@@ -20,44 +20,9 @@ public class UserDao {
     }
 
 
-
-
-    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
-        Connection conn = null;
-        PreparedStatement ps = null;
-
-        try {
-            conn = dataSource.getConnection();
-            ps = stmt.makePreparedStatement(conn);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw e;
-        } finally {
-            if (ps != null) {
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
-            }
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
-    }
-
     public void deleteAll() throws SQLException {
-        jdbcContext.workWithStatementStrategy(new StatementStrategy() {
-            @Override
-            public PreparedStatement makePreparedStatement(Connection connection) throws SQLException {
-                return connection.prepareStatement("delete from users");
-            }
-        });
+        this.jdbcContext.excuteSql("delete from users");
     }
-
-
 
     public int getCount() throws SQLException {
         Connection conn = null;
